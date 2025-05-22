@@ -1,0 +1,38 @@
+# .npmignore - excludes files from NPM package
+
+# Development files
+test/
+examples/
+*.test.js
+.nyc_output/
+coverage/
+
+# Build tools
+.eslintrc*
+jest.config.js
+tsconfig.json
+
+# Environment
+.env
+.env.*
+
+# Version control
+.git/
+.gitignore
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependencies (users install their own)
+node_modules/
