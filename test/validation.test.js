@@ -3,7 +3,8 @@ const {
     validatePrompt,
     validateData,
     validateEmails,
-    isValidEmail
+    isValidEmail,
+    validateSubject
 } = require('../src/validation');
 
 describe('Email Validation', () => {
@@ -35,6 +36,52 @@ describe('Email Validation', () => {
 
         expect(() => validateEmails('test@example.com', 'invalid-email'))
             .toThrow('Invalid "to" email address format');
+    });
+});
+
+describe('Subject Validation', () => {
+    test('should validate subject is required', () => {
+        expect(() => validateSubject(undefined))
+            .toThrow('Subject is required');
+
+        expect(() => validateSubject(null))
+            .toThrow('Subject is required');
+    });
+
+    test('should validate subject is a string', () => {
+        expect(() => validateSubject(123))
+            .toThrow('Subject must be a string');
+
+        expect(() => validateSubject({}))
+            .toThrow('Subject must be a string');
+
+        expect(() => validateSubject([]))
+            .toThrow('Subject must be a string');
+
+        expect(() => validateSubject(true))
+            .toThrow('Subject must be a string');
+    });
+
+    test('should validate subject length', () => {
+        expect(() => validateSubject('a'))
+            .toThrow('Subject must be at least 2 characters long');
+
+        expect(() => validateSubject(''))
+            .toThrow('Subject must be at least 2 characters long');
+
+        const longSubject = 'a'.repeat(257);
+        expect(() => validateSubject(longSubject))
+            .toThrow('Subject must be no more than 256 characters long');
+    });
+
+    test('should accept valid subjects', () => {
+        expect(() => validateSubject('Hi')).not.toThrow();
+        expect(() => validateSubject('Hello there')).not.toThrow();
+        expect(() => validateSubject('Meeting Tomorrow')).not.toThrow();
+
+        // Test exactly at boundaries
+        expect(() => validateSubject('ab')).not.toThrow(); // exactly 2 chars
+        expect(() => validateSubject('a'.repeat(256))).not.toThrow(); // exactly 256 chars
     });
 });
 
@@ -117,6 +164,7 @@ describe('Complete Send Options Validation', () => {
     const validOptions = {
         from: 'sender@example.com',
         to: 'receiver@example.com',
+        subject: 'Meeting Tomorrow',
         prompt: 'This is a valid prompt with enough characters',
         data: {
             name: 'John',
@@ -126,6 +174,33 @@ describe('Complete Send Options Validation', () => {
 
     test('should validate complete valid options', () => {
         expect(() => validateSendOptions(validOptions)).not.toThrow();
+    });
+
+    test('should fail on missing subject', () => {
+        const { subject, ...optionsWithoutSubject } = validOptions;
+        expect(() => validateSendOptions(optionsWithoutSubject))
+            .toThrow('Subject is required');
+    });
+
+    test('should fail on invalid subject type', () => {
+        expect(() => validateSendOptions({
+            ...validOptions,
+            subject: 123
+        })).toThrow('Subject must be a string');
+    });
+
+    test('should fail on subject too short', () => {
+        expect(() => validateSendOptions({
+            ...validOptions,
+            subject: 'a'
+        })).toThrow('Subject must be at least 2 characters long');
+    });
+
+    test('should fail on subject too long', () => {
+        expect(() => validateSendOptions({
+            ...validOptions,
+            subject: 'a'.repeat(257)
+        })).toThrow('Subject must be no more than 256 characters long');
     });
 
     test('should fail on invalid email', () => {
@@ -152,5 +227,19 @@ describe('Complete Send Options Validation', () => {
     test('should work without data field', () => {
         const { data, ...optionsWithoutData } = validOptions;
         expect(() => validateSendOptions(optionsWithoutData)).not.toThrow();
+    });
+
+    test('should accept minimum valid subject', () => {
+        expect(() => validateSendOptions({
+            ...validOptions,
+            subject: 'Hi'
+        })).not.toThrow();
+    });
+
+    test('should accept maximum valid subject', () => {
+        expect(() => validateSendOptions({
+            ...validOptions,
+            subject: 'a'.repeat(256)
+        })).not.toThrow();
     });
 });

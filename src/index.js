@@ -16,7 +16,7 @@ class ContactedAI {
             baseURL: this.baseURL,
             timeout: this.timeout,
             headers: {
-                'X-API-Key': this.apiKey,
+                'Authorization': `Bearer ${this.apiKey}`,
                 'Content-Type': 'application/json',
                 'User-Agent': 'contacted-node/1.0.0'
             }
@@ -26,6 +26,7 @@ class ContactedAI {
     /**
      * Send a message through the Contacted AI API
      * @param {Object} options - Send options
+     * @param {string} options.subject - Email subject line
      * @param {string} options.from - Sender address
      * @param {string} options.to - Receiver address
      * @param {string} options.prompt - AI prompt (10-250 characters)
@@ -36,10 +37,11 @@ class ContactedAI {
         // Validate all input before making API call
         validateSendOptions(options);
 
-        const { from, to, prompt, data } = options;
+        const {subject, from, to, prompt, data } = options;
 
         try {
             const response = await this.client.post('/send', {
+                subject,
                 from,
                 to,
                 prompt,

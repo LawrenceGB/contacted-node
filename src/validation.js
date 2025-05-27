@@ -9,6 +9,32 @@ function isValidEmail(email) {
 }
 
 /**
+ * Validates subject according to backend schema
+ * @param {any} subject
+ * @throws {Error} If validation fails
+ */
+function validateSubject(subject) {
+    // Check if subject exists (required)
+    if (subject === undefined || subject === null) {
+        throw new Error('Subject is required');
+    }
+
+    // Check if subject is a string
+    if (typeof subject !== 'string') {
+        throw new Error('Subject must be a string');
+    }
+
+    // Check length (2-256 characters)
+    if (subject.length < 2) {
+        throw new Error('Subject must be at least 2 characters long');
+    }
+
+    if (subject.length > 256) {
+        throw new Error('Subject must be no more than 256 characters long');
+    }
+}
+
+/**
  * Validates prompt according to backend schema
  * @param {any} prompt
  * @throws {Error} If validation fails
@@ -104,10 +130,13 @@ function validateSendOptions(options) {
         throw new Error('Send options must be an object');
     }
 
-    const { from, to, prompt, data } = options;
+    const {subject, from, to, prompt, data } = options;
 
     // Validate emails
     validateEmails(from, to);
+
+    // Validate subject
+    validateSubject(subject);
 
     // Validate prompt
     validatePrompt(prompt);
@@ -118,6 +147,7 @@ function validateSendOptions(options) {
 
 module.exports = {
     validateSendOptions,
+    validateSubject,
     validatePrompt,
     validateData,
     validateEmails,

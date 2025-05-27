@@ -1,4 +1,4 @@
-# ContactedAI SDK
+# Contacted TypeScript and JavaScript API Library
 
 Official Node.js SDK for the Contacted API.
 
@@ -28,6 +28,7 @@ const contacted = new ContactedAI({
 
 // Send a message
 const result = await contacted.send({
+  subject: 'Thank you for signing up with us.',
   from: 'sender@example.com',
   to: 'receiver@example.com',
   prompt: 'Generate a personalized welcome email',
@@ -50,6 +51,7 @@ const contacted = new ContactedAI({
 });
 
 const options: SendOptions = {
+  subject: 'Email subject line',
   from: 'sender@example.com',
   to: 'receiver@example.com',
   prompt: 'Generate email content',
@@ -75,12 +77,14 @@ Creates a new ContactedAI client instance.
 Send a message through the ContactedAI API.
 
 **Parameters:**
+- `subject` (string, required): Email subject (2-256 characters)
 - `from` (string, required): Valid sender email address
 - `to` (string, required): Valid receiver email address
 - `prompt` (string, required): AI prompt (10-250 characters)
 - `data` (object, optional): Additional data for personalization
 
 **Validation Rules:**
+- Subject must be 2-256 characters
 - Email addresses must be valid format
 - Prompt must be 10-250 characters
 - Data keys cannot contain spaces
@@ -102,6 +106,7 @@ The SDK provides detailed error messages for validation and API errors:
 ```javascript
 try {
   await contacted.send({
+    subejct: 'test error',
     from: 'invalid-email',
     to: 'user@example.com',
     prompt: 'short'
@@ -121,6 +126,7 @@ const contacted = new ContactedAI({
 });
 
 const result = await contacted.send({
+  subject: 'A warm welcome from my service',
   from: 'noreply@myapp.com',
   to: 'user@example.com',
   prompt: 'Create a welcome email for a new premium user',
