@@ -21,8 +21,6 @@ async function example() {
 
         console.log('Message sent successfully:', result);
 
-
-
     } catch (error) {
         console.error('Error:', error.message);
     }
