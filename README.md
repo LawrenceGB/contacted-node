@@ -39,6 +39,10 @@ const result = await contacted.send({
 });
 
 console.log('Message sent:', result);
+
+// Check message status
+const status = await contacted.getMessageStatus(result.id);
+console.log('Message status:', status.status);
 ```
 
 ## TypeScript Support
@@ -92,6 +96,23 @@ Send a message through the ContactedAI API.
 
 **Returns:** `Promise<SendResponse>`
 
+### `contacted.getMessageStatus(messageId)`
+
+Get the status of a sent message.
+
+**Parameters:**
+- `messageId` (string, required): The unique message ID returned from `send()`
+
+**Returns:** `Promise<MessageStatusResponse>` - Message status information containing:
+- `id` (string): Message ID
+- `status` (string): Current status (`queued`, `sent`, `failed`)
+- `message` (string): Human-readable status message
+- `created_at` (string): Message creation timestamp
+- `updated_at` (string): Last status update timestamp
+- `sent_at` (string, optional): Delivery timestamp (when status is 'sent')
+- `error_reason` (string, optional): Error description (when status is 'failed')
+
+**Throws:** `Error` - If messageId is invalid or API error occurs
 
 ### `contacted.status()`
 
@@ -138,16 +159,91 @@ const result = await contacted.send({
 });
 ```
 
+### Send and Track Message Status
+```javascript
+const ContactedAI = require('contacted');
+
+const contacted = new ContactedAI({
+  apiKey: 'your-api-key-here'
+});
+
+// Send message
+const result = await contacted.send({
+  subject: 'Your order confirmation',
+  from: 'orders@mystore.com',
+  to: 'customer@example.com',
+  prompt: 'Generate an order confirmation email',
+  data: {
+    orderId: '12345',
+    total: '$99.99',
+    deliveryDate: '2024-01-20'
+  }
+});
+
+const messageId = result.id;
+console.log(`✅ Message queued with ID: ${messageId}`);
+
+// Check status
+let status = await contacted.getMessageStatus(messageId);
+console.log(`📧 Status: ${status.status} - ${status.message}`);
+
+// Poll for completion (optional)
+while (status.status === 'queued') {
+  await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+  status = await contacted.getMessageStatus(messageId);
+  console.log(`📧 Status: ${status.status}`);
+}
+
+if (status.status === 'sent') {
+  console.log(`✅ Message delivered at ${status.sent_at}`);
+} else if (status.status === 'failed') {
+  console.log(`❌ Message failed: ${status.error_reason}`);
+}
+```
+
 ### With Error Handling
 ```javascript
 try {
   const result = await contacted.send(options);
   console.log('✅ Email sent successfully:', result.id);
+  
+  // Check status
+  const status = await contacted.getMessageStatus(result.id);
+  console.log(`📧 Current status: ${status.status}`);
+  
 } catch (error) {
   if (error.message.includes('Invalid')) {
     console.error('❌ Validation error:', error.message);
+  } else if (error.message.includes('not found')) {
+    console.error('❌ Message not found:', error.message);
   } else {
     console.error('❌ API error:', error.message);
+  }
+}
+```
+
+### Using async/await with TypeScript
+```typescript
+import ContactedAI, { SendResponse, MessageStatusResponse } from 'contacted';
+
+const contacted = new ContactedAI({
+  apiKey: process.env.CONTACTED_API_KEY!
+});
+
+async function sendAndTrack(): Promise<void> {
+  try {
+    const result: SendResponse = await contacted.send({
+      subject: 'Welcome aboard!',
+      from: 'welcome@myapp.com',
+      to: 'user@example.com',
+      prompt: 'Create a friendly welcome message',
+      data: { firstName: 'Sarah' }
+    });
+
+    const status: MessageStatusResponse = await contacted.getMessageStatus(result.id);
+    console.log(`Message ${result.id} is ${status.status}`);
+  } catch (error) {
+    console.error('Operation failed:', error);
   }
 }
 ```

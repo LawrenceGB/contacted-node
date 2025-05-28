@@ -53,8 +53,68 @@ class ContactedAI {
             // Handle different error types
             if (error.response) {
                 // API returned an error response
+                const status = error.response.status;
                 const errorMessage = error.response.data?.message || 'API request failed';
-                throw new Error(`ContactedAI API Error: ${errorMessage}`);
+
+                if (status === 429) {
+                    const retryAfter = error.response.data?.retry_after || 60;
+                    throw new Error(`ContactedAI API Error: Rate limit exceeded. Try again in ${retryAfter} seconds.`);
+                } else {
+                    throw new Error(`ContactedAI API Error: ${errorMessage}`);
+                }
+            } else if (error.request) {
+                // Network error
+                throw new Error('Network error: Unable to reach ContactedAI API');
+            } else {
+                // Other error
+                throw new Error(`Request error: ${error.message}`);
+            }
+        }
+    }
+
+    /**
+     * Get the status of a sent message
+     * @param {string} messageId - The unique message ID returned from send()
+     * @returns {Promise<Object>} Message status information
+     * @returns {string} returns.id - Message ID
+     * @returns {string} returns.status - Current status (queued, sent, failed)
+     * @returns {string} returns.message - Human-readable status message
+     * @returns {string} returns.created_at - Message creation timestamp
+     * @returns {string} returns.updated_at - Last status update timestamp
+     * @returns {string} [returns.sent_at] - Delivery timestamp (when status is 'sent')
+     * @returns {string} [returns.error_reason] - Error description (when status is 'failed')
+     */
+    async getMessageStatus(messageId) {
+        if (!messageId) {
+            throw new Error('Message ID is required');
+        }
+
+        if (typeof messageId !== 'string') {
+            throw new Error('Message ID must be a string');
+        }
+
+        try {
+            const response = await this.client.get('/message', {
+                params: { id: messageId }
+            });
+
+            return response.data;
+        } catch (error) {
+            // Handle different error types
+            if (error.response) {
+                const status = error.response.status;
+                const errorMessage = error.response.data?.message || 'API request failed';
+
+                if (status === 404) {
+                    throw new Error(`ContactedAI API Error: Message with ID '${messageId}' not found`);
+                } else if (status === 401) {
+                    throw new Error('ContactedAI API Error: Invalid API key');
+                } else if (status === 429) {
+                    const retryAfter = error.response.data?.retry_after || 60;
+                    throw new Error(`ContactedAI API Error: Rate limit exceeded. Try again in ${retryAfter} seconds.`);
+                } else {
+                    throw new Error(`ContactedAI API Error: ${errorMessage}`);
+                }
             } else if (error.request) {
                 // Network error
                 throw new Error('Network error: Unable to reach ContactedAI API');

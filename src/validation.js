@@ -4,8 +4,36 @@
  * @returns {boolean}
  */
 function isValidEmail(email) {
+    // Basic format check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    if (!emailRegex.test(email)) {
+        return false;
+    }
+
+    // Additional validation for consecutive dots and edge cases
+    const [localPart, domainPart] = email.split('@');
+
+    // Check for consecutive dots in local part
+    if (localPart.includes('..')) {
+        return false;
+    }
+
+    // Check for leading or trailing dots in local part
+    if (localPart.startsWith('.') || localPart.endsWith('.')) {
+        return false;
+    }
+
+    // Check for consecutive dots in domain part
+    if (domainPart.includes('..')) {
+        return false;
+    }
+
+    // Check for leading or trailing dots in domain part
+    if (domainPart.startsWith('.') || domainPart.endsWith('.')) {
+        return false;
+    }
+
+    return true;
 }
 
 /**
