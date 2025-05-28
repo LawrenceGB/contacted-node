@@ -20,11 +20,6 @@ async function example() {
         });
 
         console.log('Message sent successfully:', result);
-
-        // Get account info
-        const account = await contacted.getAccount();
-        console.log('Account info:', account);
-
     } catch (error) {
         console.error('Error:', error.message);
     }
