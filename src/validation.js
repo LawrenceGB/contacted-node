@@ -78,13 +78,13 @@ function validatePrompt(prompt) {
         throw new Error('Prompt must be a string');
     }
 
-    // Check length (10-250 characters)
+    // Check length (10-2000 characters)
     if (prompt.length < 10) {
         throw new Error('Prompt must be at least 10 characters long');
     }
 
-    if (prompt.length > 250) {
-        throw new Error('Prompt must be no more than 250 characters long');
+    if (prompt.length > 2000) {
+        throw new Error('Prompt must be no more than 2000 characters long');
     }
 }
 

@@ -106,9 +106,9 @@ describe('Prompt Validation', () => {
         expect(() => validatePrompt('short'))
             .toThrow('Prompt must be at least 10 characters long');
 
-        const longPrompt = 'a'.repeat(251);
+        const longPrompt = 'a'.repeat(2001);
         expect(() => validatePrompt(longPrompt))
-            .toThrow('Prompt must be no more than 250 characters long');
+            .toThrow('Prompt must be no more than 2000 characters long');
     });
 
     test('should accept valid prompts', () => {

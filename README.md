@@ -84,13 +84,13 @@ Send a message through the ContactedAI API.
 - `subject` (string, required): Email subject (2-256 characters)
 - `from` (string, required): Valid sender email address
 - `to` (string, required): Valid receiver email address
-- `prompt` (string, required): AI prompt (10-250 characters)
+- `prompt` (string, required): AI prompt (10-2000 characters)
 - `data` (object, optional): Additional data for personalization
 
 **Validation Rules:**
 - Subject must be 2-256 characters
 - Email addresses must be valid format
-- Prompt must be 10-250 characters
+- Prompt must be 10-2000 characters
 - Data keys cannot contain spaces
 - Data keys must be non-empty strings
 

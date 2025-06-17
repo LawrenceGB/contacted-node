@@ -29,7 +29,7 @@ class ContactedAI {
      * @param {string} options.subject - Email subject line
      * @param {string} options.from - Sender address
      * @param {string} options.to - Receiver address
-     * @param {string} options.prompt - AI prompt (10-250 characters)
+     * @param {string} options.prompt - AI prompt (10-2000 characters)
      * @param {Object} options.data - Additional data object (optional)
      * @returns {Promise<Object>} API response
      */
